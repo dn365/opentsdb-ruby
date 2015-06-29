@@ -41,7 +41,6 @@ module Opentsdb
       headers = {"Content-Type" => "application/json"}
       connect_with_retry do |http|
         request = Net::HTTP::Post.new(url, headers)
-        request.basic_auth @username, @password if basic_auth?
         response = http.request(request, data)
         if response.kind_of? Net::HTTPSuccess
           return response
