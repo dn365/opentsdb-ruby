@@ -1,5 +1,5 @@
 module Opentsdb
-  class Connection
+  class SocketConnection
 
     class ConnectionFailedError < StandardError; end
     class TimeoutException < Exception; end

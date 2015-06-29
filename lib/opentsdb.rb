@@ -1,6 +1,7 @@
 require "socket"
 require 'thread'
 require 'logger'
+require 'json'
 
 module Opentsdb
 
@@ -20,7 +21,8 @@ module Opentsdb
     l
   end
 end
-require 'opentsdb/connection'
+require 'opentsdb/socket_connection'
+require 'opentsdb/http_connection'
 require 'opentsdb/metric'
 require 'opentsdb/max_queue'
 require 'opentsdb/work_thread'

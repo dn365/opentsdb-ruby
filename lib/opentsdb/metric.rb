@@ -1,10 +1,10 @@
 module Opentsdb
   class Metric
-    attr_reader :name, :value, :timestamp, :tags
+    attr_reader :metric, :value, :timestamp, :tags
 
     def initialize(metric)
-      validate(metric,[:name,:value])
-      @name = metric[:name]
+      validate(metric,[:metric,:value])
+      @name = metric[:metric]
       @value = metric[:value]
       @timestamp = metric[:timestamp] ||  Time.now.to_i
       @tags = metric[:tags] || {}

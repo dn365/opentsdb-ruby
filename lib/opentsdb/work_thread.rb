@@ -30,19 +30,19 @@ module Opentsdb
 
     def spawn_threads!
       @options[:threads].times do |thread_num|
-
         Thread.new do
           Thread.current[:opentsdb] = self.object_id
-          
+
           while true
-            self.check_background_queue(thread_num)
+            self.check_background_queue
             sleep rand(@options[:sleep_interval])
           end
         end
       end
     end
 
-    def check_background_queue(thread_num = 0)
+
+    def check_background_queue
       # log :debug, "Checking background queue on thread #{thread_num} (#{self.current_thread_count} active)"
       begin
         data = []
@@ -52,7 +52,14 @@ module Opentsdb
         end
         return if data.empty?
         begin
-          send_message(data)
+          case @options[:content_type]
+          when "socket"
+            s_send_message(data)
+          when "http"
+            @client.put_message(data)
+          else
+            puts "Please choose socket or http."
+          end
         rescue => e
           puts "Cannot write data: #{e.inspect}"
         end
@@ -60,7 +67,7 @@ module Opentsdb
     end
 
     private
-    def send_message(data_array)
+    def s_send_message(data_array)
       data_str = ''
       data_array.each{|i| data_str << "put #{i}" << "\n"}
       @client.send_message(data_str)
