@@ -47,7 +47,7 @@ module Opentsdb
     end
 
     def put_message(metric)
-      url = @http_connection.full_url("/api/put",time_precision:Time.now.to_i)
+      url = @http_connection.full_url("/api/put")
       data = JSON.generate(metric)
       @http_connection.post(url,data)
     end

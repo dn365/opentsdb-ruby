@@ -1,5 +1,7 @@
-require "opentsdb"
+lib = File.expand_path('../../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
+require "opentsdb"
 
 METRIC_DATA = {
   metric: "system.test.cpu.user",
@@ -26,17 +28,19 @@ def socket_write
       # puts d
       @client.write_point(d)
     end
-    sleep 1
+    # sleep 1
   end
 end
 
 # test http write
 def http_write
-  @client = opentsdb::Client.new(host:"192.168.59.103:4242",max_queue:1000,threads:3)
-
-  (1000*2000).times do
+  @client = Opentsdb::Client.new(host:"192.168.59.103:4242",max_queue:1000,threads:3)
+  (2000).times do
     METRIC_DATA[:timestamp] += 1
     METRIC_DATA[:value] = rand(100)
-    @client.put_write_point(METRIC_DATA)
+    @client.put_message(METRIC_DATA)
+    # @client.put_write_point(METRIC_DATA)
   end
 end
+
+http_write
