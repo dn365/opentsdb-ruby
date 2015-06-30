@@ -51,7 +51,7 @@ module Opentsdb
       data = JSON.generate(metric)
       @http_connection.post(url,data)
     end
-
+    
     def put_write_point(metric)
       worker.push(metric)
     end
