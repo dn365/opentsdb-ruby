@@ -10,6 +10,7 @@ module Opentsdb
       :sleep_interval => 3,
       :read_timeout => 300,
       :open_timeout => 5,
+      :max => 1_000_000,
       :content_type => "http" #http or socket
     }
 
@@ -34,7 +35,7 @@ module Opentsdb
       @s_connection = socket_build_connection
       @http_connection = http_build_connection
 
-      @work = WorkThread.new(self,{max_queue:@max_queue,threads:@threads,sleep_interval:@sleep_interval,content_type:@content_type})
+      @work = WorkThread.new(self,{max_queue:@max_queue,threads:@threads,sleep_interval:@sleep_interval,content_type:@content_type,max:DEFAULT_OPTIONS[:max]})
     end
 
 
@@ -47,13 +48,33 @@ module Opentsdb
     end
 
     def put_message(metric)
-      url = @http_connection.full_url("/api/put")
+      url = full_url("/api/put")
       data = JSON.generate(metric)
-      @http_connection.post(url,data)
+      post(url,data)
     end
-    
-    def put_write_point(metric)
-      worker.push(metric)
+
+    def function_list
+      get full_url("/api/aggregators")
+    end
+
+    def metric_list(mkey=nil,max=99999)
+      options = {type:"metrics",max:max}
+      options[:q] = mkey
+      url = full_url("/api/suggest",options)
+      get(url)
+    end
+
+    def tags_list(type="tagk",mkey=nil,max=99999)
+      options = {type: type, max: max}
+      options[:q] = mkey
+      url = full_url("/api/suggest",options)
+      get(url)
+    end
+
+    def query(data)
+      url = full_url("/api/query", data)
+      puts url
+      series = get(url)
     end
 
     private
@@ -65,6 +86,18 @@ module Opentsdb
     def http_build_connection
       host, port = @broker.split(":")
       HttpConnection.new(host:host, port:port, read_timeout:@read_timeout,open_timeout:@open_timeout)
+    end
+
+    def full_url(path,options={})
+      @http_connection.full_url(path,options)
+    end
+
+    def post(url,data)
+      @http_connection.post(url,data)
+    end
+
+    def get(url)
+      @http_connection.get(url)
     end
 
     def worker

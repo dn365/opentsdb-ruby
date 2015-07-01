@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "opentsdb"
 
 METRIC_DATA = {
-  metric: "system.test.cpu.user",
+  metric: "system1.test.cpu.user",
   timestamp: Time.now.to_i,
   value: rand(100),
   tags: {
@@ -12,12 +12,12 @@ METRIC_DATA = {
     type: "gauge"
   }
 }
-
+@client = Opentsdb::Client.new(host:"192.168.59.103:4242",max_queue:200,threads:1)
 # test socket write
 def socket_write
   @client = Opentsdb::Client.new(host:"192.168.59.103:4242",max_queue:1000,threads:3,content_type:"socket")
 
-  600.times do
+  10.times do
     data = []
     (1..2000).each{ |i|
       METRIC_DATA[:timestamp] += 1
@@ -25,22 +25,56 @@ def socket_write
     }
     data.each do |i|
       d = Opentsdb::Metric.new(i).to_s
-      # puts d
       @client.write_point(d)
     end
-    # sleep 1
   end
 end
 
 # test http write
 def http_write
-  @client = Opentsdb::Client.new(host:"192.168.59.103:4242",max_queue:1000,threads:3)
-  (2000).times do
+  2000.times do
     METRIC_DATA[:timestamp] += 1
     METRIC_DATA[:value] = rand(100)
-    @client.put_message(METRIC_DATA)
-    # @client.put_write_point(METRIC_DATA)
+    @client.write_point(METRIC_DATA)
   end
 end
 
-http_write
+# test http get suggest metrics
+def get_metrics
+  @client.metric_list
+end
+
+def get_tags_keys
+  @client.tags_list
+end
+
+def get_tags_values
+  @client.tags_list("tagv")
+end
+
+def get_functions
+  @client.function_list
+end
+
+def get_query
+  data = {
+    start: Time.now.utc.to_i - 3600,
+    end: Time.now.utc.to_i,
+    m: "avg:rate:system1.test.cpu.user{host=node01}"
+    # queries: [
+    #   {
+    #     aggregator: "avg",
+    #     metric: "system.cpu.user",
+    #     rate: true,
+    #     tags: {
+    #       host: "host"
+    #     }
+    #   }
+    # ]
+  }
+
+  @client.query(data)
+
+end
+
+puts get_query.to_s
