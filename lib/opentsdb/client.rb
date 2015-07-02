@@ -105,7 +105,7 @@ module Opentsdb
       WORKER_MUTEX.synchronize do
         #this return is necessary because the previous mutex holder might have already assigned the @worker
         return @worker if @worker
-        @worker = WorkThread.new(self,{max_queue:@max_queue,threads:@threads,sleep_interval:@sleep_interval,content_type:@content_type})
+        @worker = WorkThread.new(self,{max_queue:@max_queue,threads:@threads,sleep_interval:@sleep_interval,content_type:@content_type,max:DEFAULT_OPTIONS[:max]})
       end
     end
 
