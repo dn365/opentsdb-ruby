@@ -6,7 +6,7 @@ module Opentsdb
     def initialize(client,options)
       @options = options.dup
       # @queue = Queue.new
-      @queue = MaxQueue.new(@options[:max])
+      @queue = MaxQueue.new(@options[:max_size])
       @client = client
 
       spawn_threads!

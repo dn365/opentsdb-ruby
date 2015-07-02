@@ -10,7 +10,7 @@ module Opentsdb
       :sleep_interval => 3,
       :read_timeout => 300,
       :open_timeout => 5,
-      :max => 1_000_000,
+      :max_size => 1_000_000,
       :content_type => "http" #http or socket
     }
 
@@ -35,7 +35,7 @@ module Opentsdb
       @s_connection = socket_build_connection
       @http_connection = http_build_connection
 
-      @work = WorkThread.new(self,{max_queue:@max_queue,threads:@threads,sleep_interval:@sleep_interval,content_type:@content_type,max:DEFAULT_OPTIONS[:max]})
+      @work = WorkThread.new(self,{max_queue:@max_queue,threads:@threads,sleep_interval:@sleep_interval,content_type:@content_type,max:DEFAULT_OPTIONS[:max_size]})
     end
 
 
@@ -105,7 +105,7 @@ module Opentsdb
       WORKER_MUTEX.synchronize do
         #this return is necessary because the previous mutex holder might have already assigned the @worker
         return @worker if @worker
-        @worker = WorkThread.new(self,{max_queue:@max_queue,threads:@threads,sleep_interval:@sleep_interval,content_type:@content_type,max:DEFAULT_OPTIONS[:max]})
+        @worker = WorkThread.new(self,{max_queue:@max_queue,threads:@threads,sleep_interval:@sleep_interval,content_type:@content_type,max:DEFAULT_OPTIONS[:max_size]})
       end
     end
 
