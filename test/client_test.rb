@@ -12,7 +12,7 @@ METRIC_DATA = {
     type: "gauge"
   }
 }
-@client = Opentsdb::Client.new(host:"192.168.59.103:4242",max_queue:200,threads:1)
+@client = Opentsdb::Client.new(host:"opentsdb.dntmon.com:80",max_queue:200,threads:1)
 # test socket write
 def socket_write
   @client = Opentsdb::Client.new(host:"192.168.59.103:4242",max_queue:1000,threads:3,content_type:"socket")
@@ -56,25 +56,46 @@ def get_functions
   @client.function_list
 end
 
+def get_tags_values(metric,query)
+  @client.search_loopup(metric,query)
+end
+
 def get_query
   data = {
     start: Time.now.utc.to_i - 3600,
     end: Time.now.utc.to_i,
-    m: "avg:rate:system1.test.cpu.user{host=node01}"
-    # queries: [
-    #   {
-    #     aggregator: "avg",
-    #     metric: "system.cpu.user",
-    #     rate: true,
-    #     tags: {
-    #       host: "host"
-    #     }
-    #   }
-    # ]
+    m: "avg:rate:system.cpu.user{hostname=pc-zjqdlog02}"
   }
-
   @client.query(data)
-
 end
 
+def post_query
+  data = {
+    start: Time.now.utc.to_i - 3600,
+    end: Time.now.utc.to_i,
+    queries: [
+      {
+        aggregator: "avg",
+        metric: "system.cpu.user",
+        rate: true,
+        tags: {
+          hostname: "pc-zjqdlog02"
+        }
+      },
+      {
+        aggregator: "avg",
+        metric: "system.cpu.wait",
+        rate: true,
+        tags: {
+          hostname: "pc-zjqdlog02"
+        }
+      }
+    ]
+  }
+  @client.query(data,"post")
+end
+
+# puts get_tags_values("system.cpu.user","hostname=pc-zjqdlog02")
+
+# puts post_query
 puts get_query.to_s
