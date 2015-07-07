@@ -57,24 +57,41 @@ module Opentsdb
       get full_url("/api/aggregators")
     end
 
-    def metric_list(mkey=nil,max=99999)
+    def suggest_metric_list(mkey=nil,max=99999)
       options = {type:"metrics",max:max}
       options[:q] = mkey
       url = full_url("/api/suggest",options)
       get(url)
     end
 
-    def tags_list(type="tagk",mkey=nil,max=99999)
+    def suggest_tags_list(type="tagk",mkey=nil,max=99999)
       options = {type: type, max: max}
       options[:q] = mkey
       url = full_url("/api/suggest",options)
       get(url)
     end
 
-    def query(data)
-      url = full_url("/api/query", data)
-      puts url
-      series = get(url)
+    def search_loopup(metric,query_str=nil)
+      query = query_str.nil? ? metric : metric + '{'+ query_str +'}'
+      options = {m: query}
+      url = full_url("/api/search/lookup",options)
+      data = get url
+      tags = {}
+      data["results"].map{|i| tags = tags.merge(i["tags"])}
+      tags
+    end
+
+    def query(data,type="get")
+      case type
+      when "get"
+        url = full_url("/api/query", data)
+        series = get(url)
+      when "post"
+        data = JSON.generate(data)
+        series = post("/api/query",data)
+        series = JSON.parse(series.body)
+      end
+      series.map{|i| {"metric"=> i["metric"],"tags"=>i["tags"],"values"=> i["dps"]}}
     end
 
     private
