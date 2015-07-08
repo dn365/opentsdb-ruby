@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'opentsdb/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "opentsdb-client"
+  spec.name          = "opentsdb"
   spec.version       = Opentsdb::VERSION
   spec.authors       = ["dn365"]
   spec.email         = ["dn365@outlook.com"]
