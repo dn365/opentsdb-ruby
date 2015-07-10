@@ -2,7 +2,7 @@
 ---  
  opentsdb-ruby is a Ruby Gem for OpenTSDB that provides core tools when working with an OpenTSDB data store. With opentsdb-ruby, you can search for registered metrics, tag keys and tag values, read from and write to the OpenTSDB, and submit multiple simultaneous queries to an OpenTSDB cluster. support opentsdb 2.1 or higher.  
 
- ### Build and Installation  
+### Build and Installation  
 
  build it from source and install:  
  ```
