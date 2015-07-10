@@ -41,15 +41,15 @@ end
 
 # test http get suggest metrics
 def get_metrics
-  @client.metric_list
+  @client.suggest_metric_list
 end
 
 def get_tags_keys
-  @client.tags_list
+  @client.suggest_tags_list
 end
 
 def get_tags_values
-  @client.tags_list("tagv")
+  @client.suggest_tags_list("tagv")
 end
 
 def get_functions
@@ -71,21 +71,13 @@ end
 
 def post_query
   data = {
-    start: Time.now.utc.to_i - 3600,
+    start: '1h-ago',
     end: Time.now.utc.to_i,
     queries: [
       {
         aggregator: "avg",
+        downsample: "1m-avg",
         metric: "system.cpu.user",
-        rate: true,
-        tags: {
-          hostname: "pc-zjqdlog02"
-        }
-      },
-      {
-        aggregator: "avg",
-        metric: "system.cpu.wait",
-        rate: true,
         tags: {
           hostname: "pc-zjqdlog02"
         }
@@ -95,7 +87,7 @@ def post_query
   @client.query(data,"post")
 end
 
-# puts get_tags_values("system.cpu.user","hostname=pc-zjqdlog02")
+# puts get_tags_values("system.cpu.user","api_key=554321df9d6adb0d05be83f90c0f1f38")
 
-# puts post_query
-puts get_query.to_s
+puts post_query
+# puts get_query.to_s

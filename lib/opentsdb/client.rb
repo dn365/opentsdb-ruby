@@ -77,7 +77,12 @@ module Opentsdb
       url = full_url("/api/search/lookup",options)
       data = get url
       tags = {}
-      data["results"].map{|i| tags = tags.merge(i["tags"])}
+      data["results"].each{ |i|
+        i["tags"].each{|k,v|
+          tags[k] ? tags[k] << v : tags[k] = [v]
+        }
+      }
+      tags.each{|k,v| tags[k] = v.uniq }
       tags
     end
 
@@ -91,7 +96,7 @@ module Opentsdb
         series = post("/api/query",data)
         series = JSON.parse(series.body)
       end
-      series.map{|i| {"metric"=> i["metric"],"tags"=>i["tags"],"values"=> i["dps"]}}
+      series.map{|i| {"metric"=> i["metric"],"tags"=>i["tags"],"values"=> i["dps"].to_a}}
     end
 
     private
