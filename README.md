@@ -14,8 +14,6 @@ gem install opentsdb-0.0.1.gem
 ### Usage
 Once you have the OpenTSDB cluster set up, we can configure the opentsdb-ruby Gem to talk to the API. The first step would be configuring a TimeSeries client. If no host is specified, the client connects to localhost by default. The client connects to port 4242 by default.  
 
----  
-
 Connecting to a single host:
 ```
 require 'opentsdb'
