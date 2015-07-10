@@ -12,10 +12,10 @@ METRIC_DATA = {
     type: "gauge"
   }
 }
-@client = Opentsdb::Client.new(host:"opentsdb.dntmon.com:80",max_queue:200,threads:1)
+@client = Opentsdb::Client.new(host:"opentsdb.demo.com:80",max_queue:200,threads:1)
 # test socket write
 def socket_write
-  @client = Opentsdb::Client.new(host:"192.168.59.103:4242",max_queue:1000,threads:3,content_type:"socket")
+  @client = Opentsdb::Client.new(host:"opentsdb.demo.com:80",max_queue:1000,threads:3,content_type:"socket")
 
   10.times do
     data = []
@@ -64,7 +64,7 @@ def get_query
   data = {
     start: Time.now.utc.to_i - 3600,
     end: Time.now.utc.to_i,
-    m: "avg:rate:system.cpu.user{hostname=pc-zjqdlog02}"
+    m: "avg:rate:system.cpu.user{hostname=pc-test}"
   }
   @client.query(data)
 end
@@ -79,7 +79,7 @@ def post_query
         downsample: "1m-avg",
         metric: "system.cpu.user",
         tags: {
-          hostname: "pc-zjqdlog02"
+          hostname: "pc-test"
         }
       }
     ]
@@ -87,7 +87,4 @@ def post_query
   @client.query(data,"post")
 end
 
-# puts get_tags_values("system.cpu.user","api_key=554321df9d6adb0d05be83f90c0f1f38")
-
-puts post_query
-# puts get_query.to_s
+get_query
