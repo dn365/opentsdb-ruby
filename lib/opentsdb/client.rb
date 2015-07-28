@@ -99,6 +99,17 @@ module Opentsdb
       series.map{|i| {"metric"=> i["metric"],"tags"=>i["tags"],"values"=> i["dps"].to_a}}
     end
 
+    def query_last(metric,tags)
+      data = {
+        timeseries: "#{metric}{#{tags}}",
+        back_scan: 24
+      }
+      url = full_url("/api/query/last",data)
+      metric_value = get(url)
+      
+      metric_value.last
+    end
+
     private
     def socket_build_connection
       host, port = @broker.split(":")
