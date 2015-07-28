@@ -106,8 +106,8 @@ module Opentsdb
       }
       url = full_url("/api/query/last",data)
       metric_value = get(url)
-      
-      metric_value.last
+
+      metric_value[1]
     end
 
     private
