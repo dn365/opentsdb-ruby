@@ -12,7 +12,7 @@ METRIC_DATA = {
     type: "gauge"
   }
 }
-@client = Opentsdb::Client.new(host:"opentsdb.demo.com:80",max_queue:200,threads:1)
+@client = Opentsdb::Client.new(host:"opentsdb.dntmon.com:80",max_queue:200,threads:1)
 # test socket write
 def socket_write
   @client = Opentsdb::Client.new(host:"opentsdb.demo.com:80",max_queue:1000,threads:3,content_type:"socket")
@@ -87,4 +87,12 @@ def post_query
   @client.query(data,"post")
 end
 
-get_query
+def get_query_last
+  timeseries = [
+    "system.load.1{hostname=pc-zjqdlog01}",
+    "system.cpu.user{hostname=pc-zjqdlog01}"
+  ]
+  @client.query_last(timeseries)
+end
+
+puts get_query_last.to_s

@@ -99,15 +99,12 @@ module Opentsdb
       series.map{|i| {"metric"=> i["metric"],"tags"=>i["tags"],"values"=> i["dps"].to_a}}
     end
 
-    def query_last(metric,tags)
-      data = {
-        timeseries: "#{metric}{#{tags}}",
-        back_scan: 24
-      }
-      url = full_url("/api/query/last",data)
+    def query_last(timeseries)
+      timeserie = timeseries.map{|i| "timeseries="+i}.join("&")
+      url = URI.escape("/api/query/last?#{timeserie}&back_scan=24&resolve=true")
       metric_value = get(url)
-
-      metric_value[1]
+      value = metric_value.compact
+      value.sort_by{|i| -i["timestamp"]}[0..value.count/2-1]
     end
 
     private
