@@ -8,7 +8,7 @@ module Opentsdb
 
     def initialize(host, port, socket_timeout_ms)
       @host = host
-      @port = port
+      @port = port || 4242
       @socket_timeout_ms = socket_timeout_ms
       ensure_connected
     end
