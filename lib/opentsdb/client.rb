@@ -10,7 +10,7 @@ module Opentsdb
       :sleep_interval => 3,
       :read_timeout => 300,
       :open_timeout => 5,
-      :max_size => 1_000_000,
+      :max_size => 100_000,
       :content_type => "http" #http or socket
     }
 
@@ -99,12 +99,26 @@ module Opentsdb
       series.map{|i| {"metric"=> i["metric"],"tags"=>i["tags"],"values"=> i["dps"].to_a}}
     end
 
-    def query_last(timeseries)
-      timeserie = timeseries.map{|i| "timeseries="+i}.join("&")
-      url = URI.escape("/api/query/last?#{timeserie}&back_scan=24&resolve=true")
-      metric_value = get(url)
-      value = metric_value.compact
-      value.sort_by{|i| -i["timestamp"]}[0..value.count/2-1]
+    def query_last(timeseries,type="get")
+      case type
+      when "get"
+        timeserie = timeseries.map{|i| "timeseries="+i}.join("&")
+        url = URI.escape("/api/query/last?#{timeserie}&back_scan=24&resolve=true")
+        metric_value = get(url)
+        value = metric_value.compact
+      when "post"
+        data = {
+          "resolveNames" => true,
+          "backScan" => 24
+        }
+        data["queries"] = timeseries
+        data = JSON.generate(data)
+        value = post("/api/query/last",data)
+        value = JSON.parse(value.body)
+      end
+
+      # value
+      # value.sort_by{|i| -i["timestamp"]}[0..value.count/2-1]
     end
 
     private
